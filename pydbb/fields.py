@@ -17,3 +17,5 @@ def get_fields(schema):
                 })
 
         fields = { **fields, **(schema['fields']) }
+
+    return fields
