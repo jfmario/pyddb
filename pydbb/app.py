@@ -73,7 +73,6 @@ def ensure_table(db_name, table_name):
 
     res = admin_db['tables'].update({'full_name': full_table_name}, data,
         upsert=True)
-    print(res)
 
     create_indices(get_db(db_name)[table_name], fields)
 
@@ -258,6 +257,9 @@ def patch_object(db_name, table_name, object_id):
 def create_object(db_name, table_name):
 
     obj = request.get_json()
+
+    if '_id' in obj:
+        del obj['_id']
 
     now = datetime.datetime.now()
 
