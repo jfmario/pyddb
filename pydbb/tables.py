@@ -11,3 +11,5 @@ def create_indices(table, fields):
     for f in fields:
         if 'unique' in fields[f] and fields[f]['unique']:
             table.create_index(f, unique=True)
+        if 'text' in fields[f] and fields[f]['text']:
+            table.create_index({ f: "text" })

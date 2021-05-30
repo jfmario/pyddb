@@ -2,9 +2,8 @@
 def get_fields(schema):
 
     fields = {
-        '_id': { 'read_only': True },
-        'createdDate': { 'read_only': True },
-        'modifiedDate': { 'read_only': True }
+        'createdDate': { 'read_only': True, 'dataType': "date" },
+        'modifiedDate': { 'read_only': True, 'dataType': "date" }
     }
 
     if 'fields' in schema:
@@ -19,3 +18,18 @@ def get_fields(schema):
         fields = { **fields, **(schema['fields']) }
 
     return fields
+
+def convert_record(schema, record):
+
+    out = {}
+
+    out['_id'] = str(record['_id'])
+
+    for field_name in schema:
+        if field_name in record:
+            if schema[field_name]['dataType'] == 'date':
+                out[field_name] = record[field_name].strftime('%Y-%m-%dT%H:%M:%S')
+            else:
+                out[field_name] = record[field_name]
+    
+    return out
