@@ -19,7 +19,27 @@ def get_fields(schema):
 
     return fields
 
+def pre_save(schema, record):
+    '''Cleans a record before every save.'''
+
+    obj = { **record }
+
+    # set default
+    for field_name in schema:
+        if field_name not in record:
+            if 'default' in schema[field_name]:
+                obj[field_name] = schema[field_name]['default']
+        else:
+            if 'options' in schema[field_name]:
+                if record[field_name] not in schema[field_name]['options']:
+                    raise ValueError(f"'{record[field_name]}' is not a valid choice for field 'field_name'.")
+
+    # apply other validation
+
+    return obj
+
 def convert_record(schema, record):
+    '''Converts a record for JSON output.'''
 
     out = {}
 

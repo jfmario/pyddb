@@ -11,7 +11,7 @@ from flask import Flask, jsonify, request
 
 load_dotenv()
 
-from pydbb.fields import convert_record, get_fields
+from pydbb.fields import convert_record, get_fields, pre_save
 from pydbb.mongo_db import admin_db, get_db
 from pydbb.tables import create_indices, validate_table_name
 
@@ -237,9 +237,16 @@ def patch_object(db_name, table_name, object_id):
     q = dict(q)
     q = { **q, **obj, 'modified_date': now }
 
+    existing_obj = t.find_one({ '_id': ObjectId(object_id) })
+
+    updated = { **existing_obj, **q }
+    updated = pre_save(schema, updated)
+    if '_id' in updated:
+        del updated['_id']
+
     res =  t.find_one_and_update(
         { '_id': ObjectId(object_id) },
-        { '$set': q }
+        { '$set': updated }
     )
 
     if not q:
@@ -265,6 +272,13 @@ def create_object(db_name, table_name):
 
     obj['createdDate'] = now
     obj['modifiedDate'] = now
+
+    schema = admin_db['tables'].find_one({
+        'db': db_name,
+        'name': table_name
+    })['fields']
+
+    obj = pre_save(schema, obj)
 
     try:
         insert_res = get_db(db_name)[table_name].insert_one(obj)
