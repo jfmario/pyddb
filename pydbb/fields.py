@@ -1,4 +1,6 @@
 
+import datetime
+
 def get_fields(schema):
 
     fields = {
@@ -48,7 +50,10 @@ def convert_record(schema, record):
     for field_name in schema:
         if field_name in record:
             if schema[field_name]['dataType'] == 'date':
-                out[field_name] = record[field_name].strftime('%Y-%m-%dT%H:%M:%S')
+                if type(record[field_name]) == datetime.datetime:
+                    out[field_name] = record[field_name].strftime('%Y-%m-%dT%H:%M:%S')
+                else:
+                    out[field_name] = record[field_name]
             else:
                 out[field_name] = record[field_name]
     
