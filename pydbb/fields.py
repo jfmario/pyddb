@@ -45,7 +45,7 @@ def convert_record(schema, record):
 
     out = {}
 
-    out['_id'] = str(record['_id'])
+    out['id'] = str(record['_id'])
 
     for field_name in schema:
         if field_name in record:
